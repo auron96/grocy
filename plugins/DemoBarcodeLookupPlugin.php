@@ -96,9 +96,9 @@ class DemoBarcodeLookupPlugin extends BaseBarcodeLookupPlugin
 			return [
 				'name' => 'LookedUpProduct_' . RandomString(5),
 				'location_id' => $locationId,
-				'qu_id_purchase' => $quId,
+				'qu_id_purchase' => $this->QuantityUnits[0]->id,
 				'qu_id_stock' => $quId,
-				'__qu_factor_purchase_to_stock' => 1,
+				'__qu_factor_purchase_to_stock' => 12,
 				'__barcode' => $barcode
 			];
 		}
