@@ -93,12 +93,23 @@ class DemoBarcodeLookupPlugin extends BaseBarcodeLookupPlugin
 				$quId = $this->UserSettings['product_presets_qu_id'];
 			}
 
+			// Find a different quantity unit for purchase if possible
+			$quIdPurchase = $quId;
+			foreach ($this->QuantityUnits as $qu)
+			{
+				if ($qu->id != $quId)
+				{
+					$quIdPurchase = $qu->id;
+					break;
+				}
+			}
+
 			return [
 				'name' => 'LookedUpProduct_' . RandomString(5),
 				'location_id' => $locationId,
-				'qu_id_purchase' => $this->QuantityUnits[0]->id,
+				'qu_id_purchase' => $quIdPurchase,
 				'qu_id_stock' => $quId,
-				'__qu_factor_purchase_to_stock' => 12,
+				'__qu_factor_purchase_to_stock' => 2,
 				'__barcode' => $barcode
 			];
 		}
