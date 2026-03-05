@@ -621,7 +621,7 @@ class StockService extends BaseService
 
 				// Add product to database and include new product id in output
 				$productData = $pluginOutput;
-				unset($productData['__barcode'], $productData['__qu_factor_purchase_to_stock'], $productData['__image_url']); // Virtual lookup plugin properties
+				unset($productData['__barcode'], $productData['__qu_factor_purchase_to_stock'], $productData['__image_url'], $productData['__qu_factor_consume_to_stock']); // Virtual lookup plugin properties
 
 				// Download and save image if provided
 				if (isset($pluginOutput['__image_url']) && !empty($pluginOutput['__image_url']))
@@ -689,6 +689,27 @@ class StockService extends BaseService
 							'from_qu_id' => $pluginOutput['qu_id_purchase'],
 							'to_qu_id' => $pluginOutput['qu_id_stock'],
 							'factor' => $pluginOutput['__qu_factor_purchase_to_stock'],
+						])->save();
+					}
+				}
+
+				if (isset($pluginOutput['__qu_factor_consume_to_stock']) && $pluginOutput['qu_id_stock'] != $pluginOutput['qu_id_consume'])
+				{
+					$quConversionRow = $this->getDatabase()->quantity_unit_conversions()->where('product_id = :1 AND from_qu_id = :2 AND to_qu_id = :3', $newProductRow->id, $pluginOutput['qu_id_consume'], $pluginOutput['qu_id_stock'])->fetch();
+
+					if ($quConversionRow)
+					{
+						$quConversionRow->update([
+							'factor' => $pluginOutput['__qu_factor_consume_to_stock']
+						]);
+					}
+					else
+					{
+						$this->getDatabase()->quantity_unit_conversions()->createRow([
+							'product_id' => $newProductRow->id,
+							'from_qu_id' => $pluginOutput['qu_id_consume'],
+							'to_qu_id' => $pluginOutput['qu_id_stock'],
+							'factor' => $pluginOutput['__qu_factor_consume_to_stock'],
 						])->save();
 					}
 				}
